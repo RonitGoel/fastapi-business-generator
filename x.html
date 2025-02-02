@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Business Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fafafa; /* Clean off-white background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333; /* Dark gray text */
+        }
+        .hero {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 600;
+            color: #2c3e50; /* Dark Navy Blue */
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+        .hero p {
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: #7f8c8d; /* Gray */
+            margin-bottom: 40px;
+        }
+        .container {
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+        }
+        .container input, .container button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7; /* Light Gray Border */
+            margin: 15px 0;
+            font-size: 1.1rem;
+            outline: none;
+            background-color: #ecf0f1; /* Light Gray */
+            color: #34495e; /* Dark Gray */
+            transition: all 0.3s ease;
+        }
+        .container input:focus, .container button:hover {
+            border-color: #3498db; /* Bright Blue border on focus */
+            background-color: #3498db; /* Bright Blue */
+            color: white;
+        }
+        .container button {
+            background-color: #2c3e50; /* Dark Navy Blue */
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .container button:active {
+            transform: scale(0.98);
+        }
+        .loading-spinner {
+            display: none;
+            border: 4px solid #ecf0f1;
+            border-top: 4px solid #3498db; /* Bright Blue */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+        .result {
+            display: none;
+            background-color: #34495e; /* Dark Gray */
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+            color: #fff;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        .result h3 {
+            color: #3498db; /* Blue for highlights */
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        .result p {
+            font-size: 1.2rem;
+            color: #fff;
+        }
+        .alert {
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #e74c3c; /* Red for errors */
+            color: #fff;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <h1>AI Business Generator</h1>
+        <p>Your business idea. Our AI. Instant results.</p>
+    </div>
+
+    <div class="container">
+        <input type="text" id="businessIdea" placeholder="Enter your business idea..." required>
+        <button onclick="generateBusiness()">Generate My Business</button>
+        <div class="loading-spinner" id="loading"></div>
+        <div class="alert" id="errorAlert">Please enter a valid business idea.</div>
+        
+        <div class="result" id="result">
+            <h3>Generated Business Details:</h3>
+            <p id="businessResult"></p>
+        </div>
+    </div>
+
+    <script>
+        function generateBusiness() {
+            const idea = document.getElementById("businessIdea").value;
+            if (!idea.trim()) {
+                document.getElementById("errorAlert").style.display = 'block';
+                return;
+            }
+            document.getElementById("errorAlert").style.display = 'none';
+
+            // Show loading spinner
+            document.getElementById("loading").style.display = 'inline-block';
+            document.getElementById("result").style.display = 'none';
+
+            fetch('/generate-business', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ idea: idea }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading spinner
+                document.getElementById("loading").style.display = 'none';
+
+                if (data.businessDetails) {
+                    document.getElementById("businessResult").innerHTML = data.businessDetails;
+                    document.getElementById("result").style.display = 'block';
+                } else {
+                    alert("Failed to generate business details.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("loading").style.display = 'none';
+                alert("An error occurred. Please try again later.");
+            });
+        }
+    </script>
+
+</body>
+</html>
